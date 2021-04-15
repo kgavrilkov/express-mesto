@@ -8,22 +8,14 @@ const userSchema = new mongoose.Schema({
     type: String,
     minLength: 2,
     maxLength: 30,
-    default: 'Жак-Ив Кусто',
   },
   about: {
     type: String,
     minLength: 2,
     maxLength: 30,
-    default: 'Исследователь',
   },
   avatar: {
     type: String,
-    validate: {
-      validator(v) {
-        return /^(https?:\/\/)([a-z0-9-]+)\.([a-z.]{2,6})([/\w\W.-]*)#?$/g.test(v);
-      },
-    },
-    default: 'http://ya-ya-ya.ru',
   },
   email: {
     type: String,

@@ -8,6 +8,7 @@ const mongoose = require('mongoose');
 const router = require('./routes');
 const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
+const NotFoundError = require('./errors/not-found-error');
 
 const app = express();
 const { PORT = 3000 } = process.env;
@@ -23,12 +24,18 @@ app.use(bodyParser.json());
 
 app.post('/signup', celebrate({
   body: Joi.object().keys({
+    name: Joi.string().min(2).max(30).default('Жак-Ив Кусто'),
+    about: Joi.string().min(2).max(30).default('Исследователь'),
+    avatar: Joi.string().default('https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png'),
     email: Joi.string().email().required(),
     password: Joi.string().min(8).required(),
   }).unknown(true),
 }), createUser);
 app.post('/signin', celebrate({
   body: Joi.object().keys({
+    name: Joi.string().min(2).max(30).default('Жак-Ив Кусто'),
+    about: Joi.string().min(2).max(30).default('Исследователь'),
+    avatar: Joi.string().default('https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png'),
     email: Joi.string().email().required(),
     password: Joi.string().min(8).required(),
   }).unknown(true),
@@ -40,8 +47,9 @@ app.use(router);
 
 app.use(errors());
 
-app.use((req, res) => {
-  res.status(404).send({ message: 'Ресурс не найден' });
+app.use((req, res, next) => {
+  Promise.reject(new NotFoundError('Ресурс не найден'))
+    .catch(next);
 });
 
 app.use((err, req, res, next) => {

@@ -52,6 +52,7 @@ const likeCard = (req, res, next) => {
       if (err.name === 'CastError') {
         throw new BadRequestError('Переданы некорректные данные');
       }
+      return next(new NotFoundError('Карточка не найдена'));
     })
     .catch(next);
 };
@@ -73,6 +74,7 @@ const dislikeCard = (req, res, next) => {
       if (err.name === 'CastError') {
         throw new BadRequestError('Переданы некорректные данные');
       }
+      return next(new NotFoundError('Карточка не найдена'));
     })
     .catch(next);
 };

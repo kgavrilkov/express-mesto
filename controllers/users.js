@@ -21,7 +21,10 @@ const createUser = (req, res, next) => {
         email,
         password: hash,
       })
-        .then((user) => res.send(user))
+        .then((userId) => {
+          User.findById(userId)
+            .then((user) => res.send(user));
+        })
         .catch((err) => {
           if (err.name === 'MongoError' && err.code === 11000) {
             throw new ConflictError('Пользователь с таким email уже существует');
@@ -48,7 +51,13 @@ const login = (req, res, next) => {
         httpOnly: true,
         sameSite: true,
       });
-      res.send(user);
+      res.send({
+        id: user._id,
+        name: user.name,
+        about: user.about,
+        avatar: user.avatar,
+        email: user.email,
+      });
     })
     .catch(() => {
       throw new UnauthorizedError('Необходима авторизация');
@@ -68,6 +77,7 @@ const getMe = (req, res, next) => {
       if (err.name === 'CastError') {
         throw new BadRequestError('Переданы некорректные данные');
       }
+      return next(new NotFoundError('Пользователь не найден'));
     })
     .catch(next);
 };
@@ -91,6 +101,7 @@ const getUserById = (req, res, next) => {
       if (err.name === 'CastError') {
         throw new BadRequestError('Переданы некорректные данные');
       }
+      return next(new NotFoundError('Пользователь не найден'));
     })
     .catch(next);
 };
@@ -116,6 +127,7 @@ const updateUser = (req, res, next) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
         throw new BadRequestError('Переданы некорректные данные');
       }
+      return next(new NotFoundError('Пользователь не найден'));
     })
     .catch(next);
 };
@@ -141,6 +153,7 @@ const updateAvatar = (req, res, next) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
         throw new BadRequestError('Переданы некорректные данные');
       }
+      return next(new NotFoundError('Пользователь не найден'));
     })
     .catch(next);
 };
